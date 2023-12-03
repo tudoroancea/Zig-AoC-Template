@@ -62,9 +62,6 @@ pub fn main() !void {
     try twoDigitNumbers.resize(0);
     var line_num: u32 = 1;
     while (lines.next()) |line| {
-        // if (line_num > 10) {
-        //     break;
-        // }
         verbosePrint(
             "==============================================================================================\nline {}: {s}\n",
             .{ line_num, line },
@@ -91,7 +88,7 @@ pub fn main() !void {
                     if (eq) {
                         try lineDigits.append(@as(u8, @intCast(j)) + 1);
                         verbosePrint("adding {} to lineDigits\n", .{lineDigits.items[lineDigits.items.len - 1]});
-                        i += len;
+                        i += len - 2;
                         found = true;
                         break;
                     }
