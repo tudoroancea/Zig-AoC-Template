@@ -19,7 +19,46 @@ fn verbosePrint(comptime fmt: []const u8, args: anytype) void {
     }
 }
 
-pub fn main() !void {}
+const maxRed = 12;
+const maxGreen = 13;
+const maxBlue = 14;
+
+fn check(gameRounds: String) !bool {
+    // split the game into rounds by the semicolon
+    var rounds = splitSca(u8, gameRounds, ';');
+    // for each round, split into the colors by the comma
+    while (rounds.next()) |round| {
+        var colors = splitSca(u8, round, ',');
+        // for each color, check if it's valid
+        while (colors.next()) |color| {
+            // find the number of each color, and whether it's red, green, or blue
+            const sep = lastIndexOf(u8, color, ' ') orelse unreachable;
+            const num = try parseInt(u8, color[1..sep], 10);
+            switch (color[sep + 1]) {
+                'r' => if (num > maxRed) return false,
+                'g' => if (num > maxGreen) return false,
+                'b' => if (num > maxBlue) return false,
+                else => unreachable,
+            }
+        }
+    }
+    return true;
+}
+
+pub fn main() !void {
+    var games = splitSca(u8, data, '\n');
+    var validGames: u32 = 0;
+    while (games.next()) |game| {
+        const colonIndex = indexOf(u8, game, ':') orelse unreachable;
+        const gameRounds = game[(colonIndex + 1)..];
+        if (try check(gameRounds)) {
+            // cast the slice game[5..colonIndex] to a String
+            const gameIndex = try parseInt(u8, game[5..colonIndex], 10);
+            validGames += gameIndex;
+        }
+    }
+    print("Part 1: There are {} valid games\n", .{validGames});
+}
 
 // Useful stdlib functions
 const tokenizeAny = std.mem.tokenizeAny;
