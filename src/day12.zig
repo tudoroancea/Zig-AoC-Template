@@ -11,6 +11,14 @@ const gpa = util.gpa;
 
 const data = @embedFile("data/day12.txt");
 
+const verbose: bool = false;
+
+fn verbosePrint(comptime fmt: []const u8, args: anytype) void {
+    if (verbose) {
+        print(fmt, args);
+    }
+}
+
 pub fn main() !void {}
 
 // Useful stdlib functions
