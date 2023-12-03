@@ -14,6 +14,14 @@ const str = []const u8;
 const spelledOutNumbers = [_][]const u8{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
 const lengthsOfSpelledOutNumbers = [_]u8{ 3, 3, 5, 4, 4, 3, 5, 5, 4 };
 
+const verbose: bool = false;
+
+fn verbosePrint(comptime fmt: []const u8, args: anytype) void {
+    if (verbose) {
+        print(fmt, args);
+    }
+}
+
 pub fn main() !void {
     // PART 1 ================================================================
     // split the data line by line
@@ -23,40 +31,41 @@ pub fn main() !void {
     defer twoDigitNumbers.deinit();
     var lineDigits = List(u8).init(gpa);
     defer lineDigits.deinit();
-    // while (lines.next()) |line| {
-    //     try lineDigits.resize(0);
-    //     for (line) |c| {
-    //         if (c >= '0' and c <= '9') {
-    //             try lineDigits.append(c - '0');
-    //         }
-    //     }
-    //     assert(lineDigits.items.len > 0);
-    //     // check that the line has at least two digits
-    //     if (lineDigits.items.len < 1) {
-    //         continue;
-    //     }
-    //     // find the first and last digit, and put them together to make a two-digit number
-    //     const first = lineDigits.items[0];
-    //     const last = lineDigits.items[lineDigits.items.len - 1];
-    //     const twoDigitNumber = first * 10 + last;
-    //     try twoDigitNumbers.append(twoDigitNumber);
-    // }
-    // // print the sum of all the two-digit numbers
+    while (lines.next()) |line| {
+        try lineDigits.resize(0);
+        for (line) |c| {
+            if (c >= '0' and c <= '9') {
+                try lineDigits.append(c - '0');
+            }
+        }
+        assert(lineDigits.items.len > 0);
+        // check that the line has at least two digits
+        if (lineDigits.items.len < 1) {
+            continue;
+        }
+        // find the first and last digit, and put them together to make a two-digit number
+        const first = lineDigits.items[0];
+        const last = lineDigits.items[lineDigits.items.len - 1];
+        const twoDigitNumber = first * 10 + last;
+        try twoDigitNumbers.append(twoDigitNumber);
+    }
+    // print the sum of all the two-digit numbers
     var sum: u32 = 0;
-    // for (twoDigitNumbers.items) |twoDigitNumber| {
-    //     sum += twoDigitNumber;
-    // }
-    // print("Part 1: {}\n", .{sum});
+    for (twoDigitNumbers.items) |twoDigitNumber| {
+        sum += twoDigitNumber;
+    }
+    print("Part 1: {}\n", .{sum});
 
     // PART 2 ================================================================
-    // lines = splitSca(u8, data, '\n');
+    // reset the lists
+    lines.index = 0;
     try twoDigitNumbers.resize(0);
     var line_num: u32 = 1;
     while (lines.next()) |line| {
         // if (line_num > 10) {
         //     break;
         // }
-        print(
+        verbosePrint(
             "==============================================================================================\nline {}: {s}\n",
             .{ line_num, line },
         );
@@ -68,7 +77,7 @@ pub fn main() !void {
             if (c >= '0' and c <= '9') {
                 try lineDigits.append(c - '0');
                 i += 1;
-                print("lineDigits.last: {}\n", .{lineDigits.items[lineDigits.items.len - 1]});
+                verbosePrint("lineDigits.last: {}\n", .{lineDigits.items[lineDigits.items.len - 1]});
             } else {
                 // find the spelled-out number
                 var found: bool = false;
@@ -78,10 +87,10 @@ pub fn main() !void {
                         continue;
                     }
                     const eq = std.mem.eql(u8, num, line[i .. i + len]);
-                    print("i:{}, j:{}, {s} == {s} is {}\n", .{ i, j, num, line[i .. i + len], eq });
+                    verbosePrint("i:{}, j:{}, {s} == {s} is {}\n", .{ i, j, num, line[i .. i + len], eq });
                     if (eq) {
                         try lineDigits.append(@as(u8, @intCast(j)) + 1);
-                        print("adding {} to lineDigits\n", .{lineDigits.items[lineDigits.items.len - 1]});
+                        verbosePrint("adding {} to lineDigits\n", .{lineDigits.items[lineDigits.items.len - 1]});
                         i += len;
                         found = true;
                         break;
@@ -100,10 +109,10 @@ pub fn main() !void {
         // find the first and last digit, and put them together to make a two-digit number
         const first = lineDigits.items[0];
         const last = lineDigits.items[lineDigits.items.len - 1];
-        print("lineDigits: {}, first: {}, last: {}\n", .{ lineDigits, first, last });
+        verbosePrint("lineDigits: {}, first: {}, last: {}\n", .{ lineDigits, first, last });
         const twoDigitNumber = first * 10 + last;
         try twoDigitNumbers.append(twoDigitNumber);
-        print("twoDigitNumber: {}\n", .{twoDigitNumber});
+        verbosePrint("twoDigitNumber: {}\n", .{twoDigitNumber});
         line_num += 1;
     }
     sum = 0;
